@@ -10,7 +10,7 @@ const ReservationSidebar = () => {
 
           <label htmlFor="" className='mb-2 block font-bold text-xs'>Guest</label>
 
-            <select name="w-full -ml-1 text-xm" id="">
+            <select className="w-full p-2 -ml-1 text-xm rounded-xl" id="">
                 <option>1</option>
                 <option>2</option>
                 <option>3</option>
