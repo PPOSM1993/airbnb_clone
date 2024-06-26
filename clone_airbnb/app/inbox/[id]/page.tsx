@@ -1,5 +1,5 @@
 import React from 'react'
-import ConversationDetail from '../ConversationDetail'
+import ConversationDetail from '@/app/components/inbox/ConversationDetail'
 
 const ConversationPage = () => {
   return (
