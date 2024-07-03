@@ -1,12 +1,21 @@
 'use client';
 import React from 'react'
 import { useState } from 'react';
+
 import MenuLink from './MenuLink';
+import LogoutButton from "../LogoutButton";
+
 
 import useLoginModal from '../hooks/useLoginModal';
 import useSignUpModal from '../hooks/useSignUpModal';
 
- const UserNav = () => {
+interface UserNavProps {
+  userId?: string | null;
+}
+
+const UserNav: React.FC<UserNavProps> = ({
+  userId
+}) => {
   const loginModal = useLoginModal();
   const signUpModal = useSignUpModal();
   const [isOpen, setIsOpen] = useState(false)
@@ -25,22 +34,28 @@ import useSignUpModal from '../hooks/useSignUpModal';
 
         {isOpen && (
           <div className='w-[220px] absolute top-[60px] right-0 bg-white border rounded-xl shadow-md flex flex-col cursor-pointer'>
+            {userId ? (
+              <LogoutButton />
+              ) : (
+                <>
+                  <MenuLink
+                    label='Log in'
+                    onClick={() => {
+                    setIsOpen(false);
+                    loginModal.open();
+                    }}
+                  />
 
-            <MenuLink 
-              label='Log In' 
-              onClick={() => {
-                console.log('Clicked Button')
-                loginModal.open();
-              }}
-              />
-
-            <MenuLink 
-              label='Sign Up' 
-              onClick={() => {
-                console.log('Clicked Button')
-                signUpModal.open();
-              }}
-              />
+                  <MenuLink
+                    label='Sign up'
+                    onClick={() => {
+                    setIsOpen(false);
+                    signUpModal.open();
+                    }}
+                  />
+                  
+                </>
+              )}
           </div>
         )}
     </div>

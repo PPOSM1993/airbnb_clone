@@ -7,6 +7,8 @@ import useSignUpModal from "../hooks/useSignUpModal";
 import CustomButton from "../forms/CustomButton";
 import apiService from "@/app/services/apiService";
 
+import { handleLogin } from "@/app/lib/action";
+
 
 const SignUpModal = () => {
 
@@ -30,6 +32,8 @@ const SignUpModal = () => {
     const response = await apiService.post('/api/auth/register/', JSON.stringify(formData));
 
     if(response.access) {
+      //handle Login
+      handleLogin(response.user.pk, response.access, response.refresh);
       signUpModal.close();
 
       router.push('/')
