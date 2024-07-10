@@ -1,35 +1,103 @@
 'use client';
 import Image from "next/image";
 
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 import Modal from "./Modal";
-import useAddPropertyModal from "../hooks/useAddPropertyModal";
+import useAddPropertyModal from "../../hooks/useAddPropertyModal";
 import React from "react";
 import CustomButton from "../forms/CustomButton";
 import Categories from "../addproperty/Categories";
-import { parse } from "path/posix";
+import SelectCountry, {SelectCountryValue} from "../forms/SelectCountry";
+
+import apiService from "@/app/services/apiService";
+import { useRouter } from "next/navigation";
 
 
 const AddPropertyModal = () => {
     //
     //States
+
     const [currentStep, setCurrentStep] = useState(1);
-    const[dataCategory, setDataCategory] = useState('');
+    const [errors, setErrors] = useState<string[]>([]);
+    const [dataCategory, setDataCategory] = useState('');
     const [dataTitle, setDataTitle] = useState('');
     const [dataDescription, setDataDescription] = useState('');
     const [dataPrice, setDataPrice] = useState('');
     const [dataBedRooms, setDataBedRooms] = useState('');
     const [dataBathRooms, setDataBathRooms] = useState('');
     const [dataGuest, setDataGuest] = useState('');
-    //,
+    const [dataCountry, setDataCountry] = useState<SelectCountryValue>();
+    const [dataImage, setDataImage] = useState<File | null>(null);
+
+    // 
     //
+
     const addPropertyModal = useAddPropertyModal();
+    const router = useRouter();
+
     //
     //Set Datas
     const setCategory = (category: string) => {
         setDataCategory(category)
     }
+    //
+    //
+
+    const setImage = (event: ChangeEvent<HTMLInputElement>) => {
+        if(event.target.files && event.target.files.length > 0) {
+            const tmpIamge  =event.target.files[0];
+
+            setDataImage(tmpIamge);
+        }
+    }
+
+    //
+    // SUbmit
+
+    const submitForm = async () => {
+        console.log('submitForm');
+
+        if (
+            dataCategory &&
+            dataTitle &&
+            dataDescription &&
+            dataPrice &&
+            dataCountry &&
+            dataImage
+        ) {
+            const formData = new FormData();
+            formData.append('category', dataCategory);
+            formData.append('title', dataTitle);
+            formData.append('description', dataDescription);
+            formData.append('price_per_night', dataPrice);
+            formData.append('bedrooms', dataBedRooms);
+            formData.append('bathrooms', dataBathRooms);
+            formData.append('guests', dataGuest);
+            formData.append('country', dataCountry.label);
+            formData.append('country_code', dataCountry.value);
+            formData.append('image', dataImage);
+
+            const response = await apiService.post('/api/properties/create/', formData);
+
+            if (response.success) {
+                console.log('SUCCESS :-D');
+
+                router.push('/?added=true');
+
+                addPropertyModal.close();
+            } else {
+                console.log('Error');
+
+                const tmpErrors: string[] = Object.values(response).map((error: any) => {
+                    return error;
+                })
+
+                setErrors(tmpErrors)
+            }
+        }
+    }
+
     //
     //
 
@@ -138,14 +206,50 @@ const AddPropertyModal = () => {
                     <h2 className="mb-6 text-2xl">Location</h2>
 
                     <div className="pt-3 pb-6 space-y-4">
-                        egfASDEg
+                                    <SelectCountry value={dataCountry} onChange={(value) => setDataCountry(value as SelectCountryValue)}/>
                     </div>
 
                     <CustomButton label="Previous" className="mb-2 bg-black hover:bg-gray-800" onClick={() => setCurrentStep(3)} />
                     <CustomButton label="Next" onClick={() => setCurrentStep(5)} />
                 </>
             ) : (
-                 <p>xD</p>
+                <>
+                    <h2 className='mb-6 text-2xl'>Image</h2>
+                    <div className='pt-3 pb-6 space-y-4'>
+                        <div className="py-4 px-6 bg-gray-600 text-white rounded-xl">
+                            <input type="file" accept="image/*" onChange={setImage} />
+                        </div>
+
+                        {dataImage && (
+                            <div className='w-[200px] h-[150px] relative'>
+                                <Image fill alt="Uploaded image" src={URL.createObjectURL(dataImage)} className='w-full h-full object-cover rounded-xl' />
+                            </div>
+                        )}
+                    </div>
+                    
+                    {errors.map((error, index) => {
+                        return (
+                        <div
+                            key={index}
+                            className='p-5 mb-4 bg-airbnb text-white rounded-xl opacity-80'
+                        >
+                            {error}
+                        </div>
+                        )
+                    })}
+
+
+                    <CustomButton
+                        label='Previous'
+                        className='mb-2 bg-black hover:bg-gray-800'
+                        onClick={() => setCurrentStep(4)}
+                    />
+
+                    <CustomButton
+                        label='Submit'
+                        onClick={submitForm}
+                    />
+                </>
             )
         }
         </>

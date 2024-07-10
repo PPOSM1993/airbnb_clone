@@ -3,7 +3,7 @@ import Modal from "./Modal";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import useSignUpModal from "../hooks/useSignUpModal";
+import useSignUpModal from "../../hooks/useSignUpModal";
 import CustomButton from "../forms/CustomButton";
 import apiService from "@/app/services/apiService";
 
@@ -29,7 +29,7 @@ const SignUpModal = () => {
       password1: password1,
       password2: password2
     }
-    const response = await apiService.post('/api/auth/register/', JSON.stringify(formData));
+    const response = await apiService.postWithoutToken('/api/auth/register/', JSON.stringify(formData));
 
     if(response.access) {
       //handle Login

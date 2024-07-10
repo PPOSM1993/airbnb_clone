@@ -6,8 +6,8 @@ import MenuLink from './MenuLink';
 import LogoutButton from "../LogoutButton";
 
 
-import useLoginModal from '../hooks/useLoginModal';
-import useSignUpModal from '../hooks/useSignUpModal';
+import useLoginModal from '../../hooks/useLoginModal';
+import useSignUpModal from '../../hooks/useSignUpModal';
 
 interface UserNavProps {
   userId?: string | null;
