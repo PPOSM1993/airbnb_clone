@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework_simplejwt.tokens import AccessToken
 from .forms import PropertyForm
 from .models import Property, Reservation
-from .serializers import PropertiesListSerializer, PropertiesDetailSerializer
+from .serializers import *
 from apps.user_account.models import User
 
 @api_view(['GET'])
@@ -18,6 +18,19 @@ def properties_list(request):
     return JsonResponse({
         'data': serializer.data,
     })
+
+
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([])
+def property_reservations(request, pk):
+    property = Property.objects.get(pk=pk)
+    reservations = property.reservations.all()
+
+    serializer = ReservationsListSerializer(reservations, many=True)
+
+    return JsonResponse(serializer.data, safe=False)
+
 
 @api_view(['POST', 'FILES'])
 def create_property(request):
