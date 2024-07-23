@@ -1,7 +1,12 @@
 import React from 'react'
 import Image from 'next/image'
 
-const MyReservationsPage = () => {
+import apiService from "../services/apiService";
+import Link from "next/link";
+
+const MyReservationsPage = async () => {
+  const reservations = await apiService.get('/api/auth/myreservations/')
+
   return (
     <main className="max-w-[1500px] mx-auto px-6 pb-6">
     <h1 className="my-6 text-2xl">My Reservations</h1>
@@ -44,7 +49,11 @@ const MyReservationsPage = () => {
           <p className='mb-2'><strong>Total Price: </strong>$320</p>
 
 
-          <div className='mt-5 inline-block cursor-pointer py-4 px-6 bg-airbnb text-white rounded-xl'>Go to Property</div>
+          <div 
+            className='mt-5 inline-block cursor-pointer py-4 px-6 bg-airbnb text-white rounded-xl'
+              
+          >
+            Go to Property</div>
         </div>
         
       </div>

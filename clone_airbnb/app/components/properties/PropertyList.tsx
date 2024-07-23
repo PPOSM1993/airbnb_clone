@@ -29,12 +29,14 @@ const PropertyList: React.FC<PropertyListProps> = ({
 
   const getProperties = async () => {
     let url = '/api/properties/';
-    const tmpProperties = await apiService.get(url)
+    
 
     if(landlord_id) {
       url += `?landlord_id=${landlord_id}`
     }
-
+    
+    const tmpProperties = await apiService.get(url)
+    
     setProperties(tmpProperties.data);
   };
 

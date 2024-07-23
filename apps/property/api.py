@@ -11,8 +11,9 @@ from apps.user_account.models import User
 @authentication_classes([])
 @permission_classes([])
 def properties_list(request):
-    properties = Property.objects.all()
 
+    properties = Property.objects.all()
+    
     landlord_id = request.GET.get('landlord_id', '')
 
     if landlord_id:
