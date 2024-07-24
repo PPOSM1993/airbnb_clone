@@ -7,24 +7,93 @@ from .models import Property, Reservation
 from .serializers import *
 from apps.user_account.models import User
 
+
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
 def properties_list(request):
+    #
+    # Auth
 
+    try:
+        token = request.META['HTTP_AUTHORIZATION'].split('Bearer ')[1]
+        token = AccessToken(token)
+        user_id = token.payload['user_id']
+        user = User.objects.get(pk=user_id)
+    except Exception as e:
+        user = None
+
+    #
+    #
+
+    favorites = []
     properties = Property.objects.all()
-    
+
+    #
+    # Filter
+
+    is_favorites = request.GET.get('is_favorites', '')
     landlord_id = request.GET.get('landlord_id', '')
+
+    country = request.GET.get('country', '')
+    category = request.GET.get('category', '')
+    checkin_date = request.GET.get('checkIn', '')
+    checkout_date = request.GET.get('checkOut', '')
+    bedrooms = request.GET.get('numBedrooms', '')
+    guests = request.GET.get('numGuests', '')
+    bathrooms = request.GET.get('numBathrooms', '')
+
+    print('country', country)
+
+    if checkin_date and checkout_date:
+        exact_matches = Reservation.objects.filter(start_date=checkin_date) | Reservation.objects.filter(end_date=checkout_date)
+        overlap_matches = Reservation.objects.filter(start_date__lte=checkout_date, end_date__gte=checkin_date)
+        all_matches = []
+
+        for reservation in exact_matches | overlap_matches:
+            all_matches.append(reservation.property_id)
+        
+        properties = properties.exclude(id__in=all_matches)
 
     if landlord_id:
         properties = properties.filter(landlord_id=landlord_id)
-        
-    serializer = PropertiesListSerializer(properties, many=True)
 
+    if is_favorites:
+        properties = properties.filter(favorited__in=[user])
+    
+    if guests:
+        properties = properties.filter(guests__gte=guests)
+    
+    if bedrooms:
+        properties = properties.filter(bedrooms__gte=bedrooms)
+    
+    if bathrooms:
+        properties = properties.filter(bathrooms__gte=bathrooms)
+    
+    if country:
+        properties = properties.filter(country=country)
+    
+    if category and category != 'undefined':
+        properties = properties.filter(category=category)
+    
+    #
+    # Favorites
+        
+    if user:
+        for property in properties:
+            if user in property.favorited.all():
+                favorites.append(property.id)
+
+    #
+    #
+
+    serializer = PropertiesListSerializer(properties, many=True)
 
     return JsonResponse({
         'data': serializer.data,
+        'favorites': favorites
     })
+
 
 
 @api_view(['GET'])
@@ -91,3 +160,16 @@ def BookProperty(request, pk):
         print('Error', e)
 
         return JsonResponse({'success': False})
+
+@api_view(['POST'])
+def toggle_favorite(request, pk):
+    property = Property.objects.get(pk=pk)
+
+    if request.user in property.favorited.all():
+        property.favorited.remove(request.user)
+
+        return JsonResponse({'is_favorite': False})
+    else:
+        property.favorited.add(request.user)
+
+        return JsonResponse({'is_favorite': True})
