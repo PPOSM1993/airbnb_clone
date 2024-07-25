@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view
 from .models import Conversation, ConversationMessage
 from .serializers import ConversationListSerializer, ConversationDetailSerializer, ConversationMessageSerializer
 
-from useraccount.models import User
+from apps.user_account.models import User
 
 
 @api_view(['GET'])

@@ -1,29 +1,32 @@
-import React from 'react'
+'use client';
 
+import { useRouter } from "next/navigation";
+import { ConversationType } from "@/app/inbox/page";
 
-const Conversations = () => {
+interface ConversationProps {
+  conversation: ConversationType;
+  userId: string;
+}
+
+const Conversation: React.FC<ConversationProps> = ({
+  conversation,
+  userId
+}) => {
+  const router = useRouter();
+  const otherUser = conversation.users.find((user) => user.id != userId)
+
   return (
+    <div className="px-6 py-4 cursor-pointer border border-gray-300 rounded-xl">
+      <p className="mb-6 text-xl">{otherUser?.name}</p>
 
-    <>
-      <div className="px-6 py-4 border border-gray-300 rounded-xl">
-        <p className='mb-6 text-xl'>Pedro Osorio</p>
-
-        <p className='text-airbnb-dark'>Go to Conversation</p>
-      </div>
-
-      <div className="px-6 py-4 border border-gray-300 rounded-xl">
-        <p className='mb-6 text-xl'>Pedro Osorio</p>
-        <p className='text-airbnb-dark'>Go to Conversation</p>
-      </div>
-
-      <div className="px-6 py-4 border border-gray-300 rounded-xl">
-        <p className='mb-6 text-xl'>Pedro Osorio</p>
-        <p className='text-airbnb-dark'>Go to Conversation</p>
-      </div>
-    </>
-    
-    
+      <p
+        onClick={() => router.push(`/inbox/${conversation.id}`)}
+        className="text-airbnb-dark"
+      >
+        Go to conversation
+      </p>
+    </div>
   )
 }
 
-export default Conversations
+export default Conversation;
