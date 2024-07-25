@@ -113,6 +113,7 @@ INSTALLED_APPS = [
     #CREATED_APPS
     'apps.user_account',
     'apps.property',
+    'apps.chat',
 ]
 
 MIDDLEWARE = [
