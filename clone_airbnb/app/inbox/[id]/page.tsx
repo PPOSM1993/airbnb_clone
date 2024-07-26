@@ -1,9 +1,9 @@
-import React, {useState, useEffect} from 'react'
-import ConversationDetail from '@/app/components/inbox/ConversationDetail'
-import { getUserId } from '@/app/lib/action';
-import { UserType } from '../page';
-import apiService from '@/app/services/apiService';
-import { getAccessToken } from '@/app/lib/action';
+import { getUserId } from "../../lib/action";
+import React, { useState, useEffect } from 'react';
+import apiService from "@/app/services/apiService";
+import ConversationDetail from "@/app/components/inbox/ConversationDetail";
+import { UserType } from "../page";
+import { getAccessToken } from "../../lib/action";
 
 export type MessageType = {
   id: string;
@@ -14,8 +14,7 @@ export type MessageType = {
   created_by: UserType
 }
 
-const ConversationPage = async ({params} : {params: {id: string}}) => {
-
+const ConversationPage = async ({ params }: { params: { id: string } }) => {
   const userId = await getUserId();
   const token = await getAccessToken();
 
@@ -27,13 +26,18 @@ const ConversationPage = async ({params} : {params: {id: string}}) => {
     )
   }
 
-  const conversation = await apiService.get(`/api/chat/${params.id}/`);
+  const conversation = await apiService.get(`/api/chat/${params.id}/`)
 
   return (
     <main className="max-w-[1500px] mx-auto px-6 pb-6">
-      <ConversationDetail token={token} userId={userId} conversation={conversation.conversation} />
+      <ConversationDetail
+        token={token}
+        userId={userId}
+        messages={conversation.messages}
+        conversation={conversation.conversation}
+      />
     </main>
   )
 }
 
-export default ConversationPage
+export default ConversationPage;
